@@ -22,3 +22,15 @@
 
 g++ main.cpp \*.cpp -o app ./app
 
+lab-02
+
+Лабораторная работа: реализация трёх связанных классов (Profile, Post, User) на C++ с демонстрацией отношений композиции и агрегации, работы с памятью и проверки правил предметной области.
+
+сборка
+
+Developer Powershell for VS
+cl /EHsc /std:c++17 /utf-8 main.cpp user.cpp post.cpp profile.cpp /Fe:app.exe
+.\app.exe
+
+MinGW
+g++ main.cpp user.cpp post.cpp profile.cpp -o app
