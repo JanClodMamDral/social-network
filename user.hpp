@@ -1,8 +1,10 @@
 #pragma once
-#include "profile.hpp"
+
+#include <cstddef>
+#include <memory>
 #include <string>
 #include <string_view>
-#include <vector>
+
 
 namespace social_network
 {
@@ -12,22 +14,32 @@ class User
 {
 private:    
     std::string m_username{};
-    Profile m_profile{};
-    std::vector<Post*> m_posts{};
+    std::string m_bio{};
+    std::unique_ptr<std::weak_ptr<Post>[]> m_posts{};
+    std::size_t m_postsCount{ 0 };
+    std::size_t m_postsCapacity{ 0 };
+
+    void GrowPosts();
 
 public:
-    User() = default;
-
     User(std::string_view username);
     ~User();
 
-    void ЗаполнитьПрофиль(std::string_view bio);
-    void ДобавитьЗапись(Post* post);
-    void ПоказатьЛенту() const;
+    void ChangeBio(std::string_view bio);
+    void Inspect() const;
+    void AddPost(const std::shared_ptr<Post>& post);
+    void ShowFeed() const;
 
     [[nodiscard]] std::string_view GetUsername() const
     {
         return m_username;
     }
+
+    [[nodiscard]] std::string_view GetBio() const
+    {
+        return m_bio;
+    }
+
+    [[nodiscard]] std::size_t CountAlivePosts() const;
 };
 }
