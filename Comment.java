@@ -1,9 +1,5 @@
 package socialnetwork;
 
-/**
- * Комментарий под записью. Часть поста (композиция): создаётся только самим
- * постом и снаружи не выдаётся.
- */
 public class Comment {
     private final String author;
     private String text;
@@ -25,14 +21,6 @@ public class Comment {
         }
         text = newText;
         return true;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getText() {
-        return text;
     }
 
     @Override

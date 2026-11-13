@@ -1,16 +1,10 @@
 package socialnetwork;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Пользователь. Хранит ссылки на записи, созданные снаружи (агрегация):
- * записи не принадлежат пользователю и существуют, пока на них есть ссылки.
- */
 public class User {
     private final String username;
     private String bio = "";
-    private final List<Post> posts = new ArrayList<>();
+    private Post[] posts = new Post[4];
+    private int postsCount;
 
     public User(String username) {
         if (username == null || username.isBlank()) {
@@ -30,27 +24,27 @@ public class User {
             System.out.println("Ошибка: нельзя добавить пустую ссылку вместо записи");
             return;
         }
-        posts.add(post);
+        if (postsCount == posts.length) {
+            Post[] bigger = new Post[posts.length * 2];
+            for (int i = 0; i < postsCount; i++) {
+                bigger[i] = posts[i];
+            }
+            posts = bigger;
+        }
+        posts[postsCount] = post;
+        postsCount++;
     }
 
     public void showFeed() {
         System.out.println("---Лента пользователя " + username + "---");
         System.out.println("О себе: " + bio);
-        for (Post post : posts) {
-            System.out.println(post);
+        for (int i = 0; i < postsCount; i++) {
+            System.out.println(posts[i]);
         }
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getBio() {
-        return bio;
     }
 
     @Override
     public String toString() {
-        return "Пользователь " + username + " (записей: " + posts.size() + ")";
+        return "Пользователь " + username + " (записей: " + postsCount + ")";
     }
 }

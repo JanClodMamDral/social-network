@@ -1,19 +1,10 @@
 package socialnetwork;
 
-import java.lang.ref.Cleaner;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Запись. Владеет своими комментариями (композиция): список и комментарии
- * создаёт сама, наружу ссылки на комментарии не отдаёт.
- */
-public final class Post {
-    private static final Cleaner CLEANER = Cleaner.create();
-
+public class Post {
     private final String text;
     private int likesCount;
-    private final List<Comment> comments;
+    private Comment[] comments = new Comment[4];
+    private int commentsCount;
 
     public Post(String text) {
         if (text == null || text.isBlank()) {
@@ -22,8 +13,6 @@ public final class Post {
         } else {
             this.text = text;
         }
-        this.comments = new ArrayList<>();
-        CLEANER.register(this, new PostCleanup(this.text));
     }
 
     public void addLike() {
@@ -31,54 +20,32 @@ public final class Post {
     }
 
     public void addComment(String author, String commentText) {
-        comments.add(new Comment(author, commentText));
+        if (commentsCount == comments.length) {
+            Comment[] bigger = new Comment[comments.length * 2];
+            for (int i = 0; i < commentsCount; i++) {
+                bigger[i] = comments[i];
+            }
+            comments = bigger;
+        }
+        comments[commentsCount] = new Comment(author, commentText);
+        commentsCount++;
     }
 
     public boolean editComment(int index, String newText) {
-        if (index < 0 || index >= comments.size()) {
+        if (index < 0 || index >= commentsCount) {
             System.out.println("[Отказ] Комментария с номером " + index + " не существует");
             return false;
         }
-        return comments.get(index).edit(newText);
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public int getLikesCount() {
-        return likesCount;
-    }
-
-    public int getCommentsCount() {
-        return comments.size();
+        return comments[index].edit(newText);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Пост: \"").append(text).append("\" | Лайков: ").append(likesCount)
-                .append(" | Комментариев: ").append(comments.size());
-        for (Comment comment : comments) {
-            sb.append(System.lineSeparator()).append("    ").append(comment);
+        String result = "Пост: \"" + text + "\" | Лайков: " + likesCount
+                + " | Комментариев: " + commentsCount;
+        for (int i = 0; i < commentsCount; i++) {
+            result += "\n    " + comments[i];
         }
-        return sb.toString();
-    }
-
-    /**
-     * Действие очистки. Не должно ссылаться на сам Post, иначе пост никогда
-     * не станет недостижимым, поэтому хранит только копию текста.
-     */
-    private static class PostCleanup implements Runnable {
-        private final String postText;
-
-        PostCleanup(String postText) {
-            this.postText = postText;
-        }
-
-        @Override
-        public void run() {
-            System.out.println("[Post] уничтожен сборщиком мусора: \"" + postText + "\"");
-        }
+        return result;
     }
 }
